@@ -1,11 +1,12 @@
 import React from 'react';
 import Logo from "../../assets/website/oglogo.png";
 import Acc from "../../assets/website/id.png";
+import { Link } from 'react-router-dom';
 const Menus = [
     {
         id:1,
         name : "Home",
-        link : "/#"
+        link : ""
     },
     {
         id:2,
@@ -37,9 +38,9 @@ const Navbar = () => {
                     {
                         Menus.map((data,index) => (
                             <li key={index}>
-                                <a href={data.link} className='hover:text-yellow hover:underline inline-block text-xl  px-1 text-white/70 hover:text-white dureation-200'> 
+                                <Link href={data.link} className='hover:text-yellow hover:underline inline-block text-xl  px-1 text-white/70  dureation-200'> 
                                 {data.name}
-                                </a>   
+                                </Link>   
                             </li>
                         ))
                     }
