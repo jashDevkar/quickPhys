@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import m1 from "../../assets/website/module1.jpg";
 import m2 from "../../assets/website/module2.jpg";
 import m3 from "../../assets/website/module3.jpg";
@@ -6,6 +6,9 @@ import m4 from "../../assets/website/module4.jpg";
 import m5 from "../../assets/website/module5.jpeg";
 import m6 from "../../assets/website/module6.jpg";
 import { useParams } from 'react-router-dom';
+
+import {db} from '../../firebase/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 const modules = [
@@ -52,6 +55,28 @@ const Modules = () => {
 
   const params = useParams();
   console.log(params)//Semester 1 or Semester 2
+
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      try {
+        const docRef = doc(db, 'modules', params.name);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          console.log(docSnap.data());
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchDocument();
+  }, []);
 
   return (
     <div >
