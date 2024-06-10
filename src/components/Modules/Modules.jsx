@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import m1 from "../../assets/website/module1.jpg";
 import m2 from "../../assets/website/module2.jpg";
 import m3 from "../../assets/website/module3.jpg";
@@ -7,8 +7,8 @@ import m5 from "../../assets/website/module5.jpeg";
 import m6 from "../../assets/website/module6.jpg";
 import { useParams } from 'react-router-dom';
 
-import {db} from '../../firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 
 
 const modules = [
@@ -53,30 +53,57 @@ const modules = [
 
 const Modules = () => {
 
+  const [moduleData, setModuleData] = useState([])
+  const [loading, setLoading] = useState(true)
+  let fetchDataDoc, collType;
+
   const params = useParams();
-  console.log(params)//Semester 1 or Semester 2
+
+  if (params.name == "Semester 1") {
+    fetchDataDoc = "semester 1";
+    collType = "physics 1";
+  }
+  else {
+    fetchDataDoc = "semester 2";
+    collType = "physics 2";
+  }
+  // console.log(params)//Semester 1 or Semester 2
 
 
   useEffect(() => {
     const fetchDocument = async () => {
       try {
-        const docRef = doc(db, 'modules', params.name);
-        const docSnap = await getDoc(docRef);
+        const docRef = collection(db, 'modules', fetchDataDoc, collType);
+        const snapshot = await getDocs(docRef);
+        const data = snapshot.docs.map(doc => ({ ...doc.data() }))
 
-        if (docSnap.exists()) {
-          console.log(docSnap.data());
+        if (data.length != 0) {
+
+          setModuleData([...data]);
+          console.log(moduleData)  //set data of firestore if exist
+
         } else {
           console.log('No such document!');
+          //raise error
         }
       } catch (error) {
         console.error('Error fetching document:', error);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
 
     fetchDocument();
   }, []);
+
+  if (loading) {
+    return (
+      <div className='w-full max-h-screen min-h-svh flex justify-center items-center'>
+        <div className="loader border-t-2 rounded-full border-gray-500 bg-gray-300 animate-spin
+aspect-square w-8 flex justify-center items-center text-yellow-700"></div>
+      </div>
+    )
+  }
 
   return (
     <div >
@@ -96,6 +123,17 @@ const Modules = () => {
           </div>
         ))}
       </div>
+      <>
+        {
+          moduleData.map((item, index) => (
+            <>
+            <h1>{item.Name}</h1>
+            <span>{item.Description}</span>
+            </>
+          ))
+        }
+
+      </>
 
 
     </div>
